@@ -1,0 +1,7 @@
+# DevlinDemo
+
+## Package
+```
+./gradlew shadowJar
+```
+
