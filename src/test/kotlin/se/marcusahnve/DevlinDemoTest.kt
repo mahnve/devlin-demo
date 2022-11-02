@@ -1,5 +1,6 @@
 package se.marcusahnve
 
+import io.kotest.core.spec.style.ExpectSpec
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import org.http4k.client.OkHttp
@@ -8,14 +9,17 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 
-class DevlinDemoTest : ShouldSpec({
-
+class DevlinDemoTest : ExpectSpec({
 
 
     context("Calling static App") {
         val response = staticApp(Request(GET, "/"))
-        should("return Hello World") {
-            response shouldBe Response(OK).body("Hello World")
+        expect("body is 'Hello World'") {
+            response.body.toString() shouldBe "Hello World"
+        }
+
+        expect("return code to be 200") {
+            response.status shouldBe OK
         }
     }
 
@@ -58,8 +62,12 @@ class DevlinDemoTest : ShouldSpec({
 
     context("Calling parameterized app with name query set to DevLin") {
         val response = parameterizedApp(Request(GET, "/").query("name", "DevLin"))
-        should("return Hello Marcus") {
-            response shouldBe Response(OK).body("Hello DevLin")
+        expect("body to be Hello Devlin") {
+            response.body.toString() shouldBe "Hello DevLin"
+        }
+
+        expect("response status to be 200") {
+            response.status shouldBe OK
         }
     }
 
@@ -104,18 +112,25 @@ class DevlinDemoTest : ShouldSpec({
 
         context("calling /helloworld") {
             val response = routedApp(Request(GET, "/helloworld"))
-            should("return Hello World") {
-                response shouldBe Response(OK).body("Hello World!")
+            expect("body to be Hello World") {
+                response.body.toString() shouldBe "Hello World"
             }
-        }
 
-        context("calling /queryparams?name=DevLin") {
-            val response = routedApp(Request(GET, "/queryparams").query("name", "Devlin"))
-            should("return Hello World") {
-                response shouldBe Response(OK).body("Hello Devlin")
+            expect("response status to be 200") {
+                response.status shouldBe OK
             }
-        }
 
+            context("calling /queryparams?name=DevLin") {
+                val response = routedApp(Request(GET, "/queryparams").query("name", "DevLin"))
+                expect("body to be Hello DevLin") {
+                    response.body.toString() shouldBe "Hello DevLin"
+                }
+                expect("response status to be 200") {
+                    response.status shouldBe OK
+                }
+            }
+
+        }
     }
 
     context("running for real") {
@@ -124,21 +139,27 @@ class DevlinDemoTest : ShouldSpec({
             server.start()
         }
         afterTest { server.stop() }
-
         val client = OkHttp()
 
         context("calling /helloworld") {
             val response = client(Request(GET, "http://localhost:9000/helloworld"))
-            should("return Hello World") {
-                response shouldBe Response(OK).body("Hello World!")
+            expect("body to be Hello World") {
+                response.body.toString() shouldBe "Hello World"
+            }
+            expect("response status to be 200") {
+                response.status shouldBe OK
             }
         }
 
         context("calling /queryparams?name=DevLin") {
-            val response = client(Request(GET, "http://localhost:9000/queryparams").query("name", "Devlin"))
-            should("return Hello World") {
-                response shouldBe Response(OK).body("Hello Devlin")
+            val response = client(Request(GET, "http://localhost:9000/queryparams").query("name", "DevLin"))
+            expect("body to be Hello DevLin") {
+                response.body.toString() shouldBe "Hello DevLin"
             }
+            expect("response status to be 200") {
+                response.status shouldBe OK
+            }
+
         }
 
     }
