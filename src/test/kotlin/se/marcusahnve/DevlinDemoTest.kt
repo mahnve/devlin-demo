@@ -1,19 +1,17 @@
 package se.marcusahnve
 
 import io.kotest.core.spec.style.ExpectSpec
-import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import org.http4k.client.OkHttp
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 
 class DevlinDemoTest : ExpectSpec({
 
 
     context("Calling static App") {
-        val response = staticApp(Request(GET, "/"))
+        val response = staticHandler(Request(GET, "/"))
         expect("body is 'Hello World'") {
             response.body.toString() shouldBe "Hello World"
         }
@@ -61,7 +59,7 @@ class DevlinDemoTest : ExpectSpec({
 
 
     context("Calling parameterized app with name query set to DevLin") {
-        val response = parameterizedApp(Request(GET, "/").query("name", "DevLin"))
+        val response = parameterizedHandler(Request(GET, "/").query("name", "DevLin"))
         expect("body to be Hello Devlin") {
             response.body.toString() shouldBe "Hello DevLin"
         }
